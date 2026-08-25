@@ -13,11 +13,12 @@ import { UnlinkButton } from "@/components/app/unlink-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { EmptyState } from "@/components/app/empty-state";
 import { unlinkContactFromApplication } from "@/lib/actions/applications";
 import { unlinkDocumentVersionFromApplication } from "@/lib/actions/documents";
 import { removeRecommenderFromApplication } from "@/lib/actions/recommenders";
 import { format } from "date-fns";
-import { Pencil, ExternalLink } from "lucide-react";
+import { Pencil, ExternalLink, Users, FileText, UserCheck } from "lucide-react";
 
 export default async function ApplicationDetailPage({
   params,
@@ -58,7 +59,7 @@ export default async function ApplicationDetailPage({
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold">{application.school}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight">{application.school}</h1>
             <StatusBadge status={application.status} />
           </div>
           <p className="text-muted-foreground">
@@ -144,7 +145,10 @@ export default async function ApplicationDetailPage({
             </CardHeader>
             <CardContent className="space-y-3">
               {application.contacts.map(({ contact, role }) => (
-                <div key={contact.id} className="flex items-center justify-between gap-2">
+                <div
+                  key={contact.id}
+                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary/60"
+                >
                   <Link href={`/contacts/${contact.id}`} className="text-sm">
                     <span className="font-medium">{contact.name}</span>
                     {role && <span className="text-muted-foreground"> · {role}</span>}
@@ -155,7 +159,12 @@ export default async function ApplicationDetailPage({
                 </div>
               ))}
               {application.contacts.length === 0 && (
-                <p className="text-sm text-muted-foreground">No contacts linked yet.</p>
+                <EmptyState
+                  className="py-5"
+                  icon={Users}
+                  title="No contacts linked yet"
+                  description="Link a professor or POI once you've reached out."
+                />
               )}
               <Separator />
               <AddContactForm applicationId={id} contacts={allContacts} />
@@ -168,7 +177,10 @@ export default async function ApplicationDetailPage({
             </CardHeader>
             <CardContent className="space-y-3">
               {application.documents.map(({ documentVersion, roleNote }) => (
-                <div key={documentVersion.id} className="flex items-center justify-between gap-2">
+                <div
+                  key={documentVersion.id}
+                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary/60"
+                >
                   <a
                     href={documentVersion.fileUrl}
                     target="_blank"
@@ -188,7 +200,12 @@ export default async function ApplicationDetailPage({
                 </div>
               ))}
               {application.documents.length === 0 && (
-                <p className="text-sm text-muted-foreground">No documents linked yet.</p>
+                <EmptyState
+                  className="py-5"
+                  icon={FileText}
+                  title="No documents linked yet"
+                  description="Attach an SOP, CV, or writing sample version."
+                />
               )}
               <Separator />
               <AddDocumentForm applicationId={id} versions={allDocumentVersions} />
@@ -201,7 +218,10 @@ export default async function ApplicationDetailPage({
             </CardHeader>
             <CardContent className="space-y-3">
               {application.recommenders.map(({ recommender, status }) => (
-                <div key={recommender.id} className="flex items-center justify-between gap-2">
+                <div
+                  key={recommender.id}
+                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary/60"
+                >
                   <Link href={`/contacts/${recommender.contactId}`} className="text-sm">
                     {recommender.contact.name}
                   </Link>
@@ -222,7 +242,12 @@ export default async function ApplicationDetailPage({
                 </div>
               ))}
               {application.recommenders.length === 0 && (
-                <p className="text-sm text-muted-foreground">No recommenders yet.</p>
+                <EmptyState
+                  className="py-5"
+                  icon={UserCheck}
+                  title="No recommenders yet"
+                  description="Add one once you've asked someone to write for you."
+                />
               )}
               <Separator />
               <AddRecommenderForm applicationId={id} contacts={allContacts} />

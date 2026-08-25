@@ -12,7 +12,7 @@ export default async function EditApplicationPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Edit application</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Edit application</h1>
       <ApplicationForm
         application={application}
         action={updateApplication.bind(null, id)}

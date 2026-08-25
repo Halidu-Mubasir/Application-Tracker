@@ -23,7 +23,7 @@ export function MainNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1">
+    <nav className="flex flex-col gap-0.5">
       {links.map(({ href, label, icon: Icon }) => {
         const active =
           href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -32,13 +32,16 @@ export function MainNav() {
             key={href}
             href={href}
             className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13.5px] font-medium transition-colors",
               active
-                ? "bg-secondary text-secondary-foreground"
-                : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                ? "bg-brand-soft text-brand"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
             )}
           >
-            <Icon className="size-4" />
+            <Icon
+              className={cn("size-4 shrink-0", active ? "opacity-100" : "opacity-70")}
+              strokeWidth={1.8}
+            />
             {label}
           </Link>
         );

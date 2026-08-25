@@ -7,8 +7,9 @@ import { Timeline } from "@/components/app/timeline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/app/empty-state";
 import { RECOMMENDER_STATUS_LABEL } from "@/lib/constants";
-import { Pencil, ExternalLink } from "lucide-react";
+import { Pencil, ExternalLink, FileText } from "lucide-react";
 
 export default async function ContactDetailPage({
   params,
@@ -33,7 +34,7 @@ export default async function ContactDetailPage({
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">{contact.name}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">{contact.name}</h1>
           <p className="text-muted-foreground">
             {[contact.university, contact.department].filter(Boolean).join(" · ") || "—"}
           </p>
@@ -127,7 +128,7 @@ export default async function ContactDetailPage({
                 <Link
                   key={application.id}
                   href={`/applications/${application.id}`}
-                  className="flex items-center justify-between gap-2 text-sm"
+                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-secondary/60"
                 >
                   <span>
                     {application.school}
@@ -137,7 +138,11 @@ export default async function ContactDetailPage({
                 </Link>
               ))}
               {contact.applications.length === 0 && (
-                <p className="text-sm text-muted-foreground">Not linked to an application yet.</p>
+                <EmptyState
+                  className="py-5"
+                  icon={FileText}
+                  title="Not linked to an application yet"
+                />
               )}
             </CardContent>
           </Card>
@@ -152,7 +157,7 @@ export default async function ContactDetailPage({
                   <Link
                     key={application.id}
                     href={`/applications/${application.id}`}
-                    className="flex items-center justify-between gap-2 text-sm"
+                    className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-secondary/60"
                   >
                     <span>{application.school}</span>
                     <Badge variant="outline">{RECOMMENDER_STATUS_LABEL[status]}</Badge>

@@ -8,9 +8,11 @@ import {
   Flag,
   UserCheck,
   CircleDot,
+  Activity,
 } from "lucide-react";
+import { EmptyState } from "@/components/app/empty-state";
 
-const ICON: Record<TimelineEvent["type"], typeof Mail> = {
+export const TIMELINE_EVENT_ICON: Record<TimelineEvent["type"], typeof Mail> = {
   STATUS_CHANGE: CircleDot,
   EMAIL_SENT: Mail,
   EMAIL_RECEIVED: MailOpen,
@@ -23,17 +25,25 @@ const ICON: Record<TimelineEvent["type"], typeof Mail> = {
 
 export function Timeline({ events }: { events: TimelineEvent[] }) {
   if (events.length === 0) {
-    return <p className="text-sm text-muted-foreground">No activity yet.</p>;
+    return (
+      <EmptyState
+        icon={Activity}
+        title="No activity yet"
+        description="Status changes, notes, and linked emails will show up here."
+      />
+    );
   }
 
   return (
     <ol className="space-y-4">
       {events.map((event) => {
-        const Icon = ICON[event.type];
+        const Icon = TIMELINE_EVENT_ICON[event.type];
         return (
           <li key={event.id} className="flex gap-3">
-            <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-            <div className="space-y-0.5">
+            <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-md bg-muted">
+              <Icon className="size-3.5 text-muted-foreground" strokeWidth={1.8} />
+            </span>
+            <div className="space-y-0.5 pt-0.5">
               <p className="text-sm">{event.title}</p>
               {event.description && (
                 <p className="whitespace-pre-wrap text-sm text-muted-foreground">

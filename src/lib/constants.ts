@@ -24,18 +24,52 @@ export const STATUS_LABEL: Record<ApplicationStatus, string> = {
   WITHDRAWN: "Withdrawn",
 };
 
-// Tailwind classes per status, used by the StatusBadge component.
-export const STATUS_COLOR: Record<ApplicationStatus, string> = {
-  RESEARCHING: "bg-muted text-muted-foreground",
-  PROF_CONTACTED: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300",
-  SUBMITTED: "bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300",
-  INTERVIEW: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300",
-  DECISION_PENDING: "bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300",
-  ACCEPTED: "bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300",
-  REJECTED: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  WAITLISTED: "bg-orange-100 text-orange-800 dark:bg-orange-950 dark:text-orange-300",
-  WITHDRAWN: "bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400",
+// Semantic family per status — the single source of truth for status color
+// everywhere it appears (badges, stat cards, list-item accents). "info"
+// covers the whole in-progress family (contacted/submitted/interview) as
+// one hue, per design direction.
+export type StatusFamily = "neutral" | "info" | "warning" | "success" | "danger";
+
+export const STATUS_FAMILY: Record<ApplicationStatus, StatusFamily> = {
+  RESEARCHING: "neutral",
+  PROF_CONTACTED: "info",
+  SUBMITTED: "info",
+  INTERVIEW: "info",
+  DECISION_PENDING: "warning",
+  ACCEPTED: "success",
+  REJECTED: "danger",
+  WAITLISTED: "warning",
+  WITHDRAWN: "neutral",
 };
+
+const FAMILY_BADGE_CLASSES: Record<StatusFamily, string> = {
+  neutral: "bg-neutral-status-soft text-neutral-status",
+  info: "bg-info-soft text-info",
+  warning: "bg-warning-soft text-warning",
+  success: "bg-success-soft text-success",
+  danger: "bg-danger-soft text-danger",
+};
+
+export const FAMILY_BAR_CLASSES: Record<StatusFamily, string> = {
+  neutral: "bg-neutral-status",
+  info: "bg-info",
+  warning: "bg-warning",
+  success: "bg-success",
+  danger: "bg-danger",
+};
+
+export const FAMILY_BORDER_CLASSES: Record<StatusFamily, string> = {
+  neutral: "border-neutral-status",
+  info: "border-info",
+  warning: "border-warning",
+  success: "border-success",
+  danger: "border-danger",
+};
+
+// Tailwind classes per status, used by the StatusBadge component.
+export const STATUS_COLOR: Record<ApplicationStatus, string> = Object.fromEntries(
+  APPLICATION_STATUSES.map((status) => [status, FAMILY_BADGE_CLASSES[STATUS_FAMILY[status]]])
+) as Record<ApplicationStatus, string>;
 
 export const DOCUMENT_TYPES: DocumentType[] = [
   "SOP",

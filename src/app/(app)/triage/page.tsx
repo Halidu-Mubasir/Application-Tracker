@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import { syncAndGetTriageCandidates } from "@/lib/gmail";
 import { TriageCandidateCard } from "@/components/app/triage-candidate-card";
+import { EmptyState } from "@/components/app/empty-state";
 import { Card, CardContent } from "@/components/ui/card";
+import { Inbox, AlertTriangle } from "lucide-react";
 
 export default async function TriagePage() {
   let candidates: Awaited<ReturnType<typeof syncAndGetTriageCandidates>> = [];
@@ -27,7 +29,7 @@ export default async function TriagePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Gmail triage</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Gmail triage</h1>
         <p className="text-sm text-muted-foreground">
           Application-shaped emails not yet linked to anything. Replies in
           threads you&apos;ve already linked are attached automatically and
@@ -37,16 +39,21 @@ export default async function TriagePage() {
 
       {error && (
         <Card>
-          <CardContent className="pt-6 text-sm text-destructive">{error}</CardContent>
+          <CardContent className="flex items-start gap-3 pt-6 text-sm text-destructive">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            {error}
+          </CardContent>
         </Card>
       )}
 
       {!error && candidates.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-sm text-muted-foreground">
-            No new candidate emails right now.
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border bg-card shadow-elevation-sm">
+          <EmptyState
+            icon={Inbox}
+            title="No new candidate emails right now"
+            description="Check back after emailing a professor or hearing from one — matches show up here for you to link."
+          />
+        </div>
       )}
 
       <div className="space-y-3">

@@ -12,7 +12,7 @@ export default async function EditContactPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Edit contact</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Edit contact</h1>
       <ContactForm contact={contact} action={updateContact.bind(null, id)} />
     </div>
   );

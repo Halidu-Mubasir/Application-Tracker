@@ -2,6 +2,8 @@ import Link from "next/link";
 import { runSearch } from "@/lib/search";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/app/empty-state";
+import { SearchX } from "lucide-react";
 
 export default async function SearchPage({
   searchParams,
@@ -13,7 +15,7 @@ export default async function SearchPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Search</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Search</h1>
         {q && (
           <p className="text-sm text-muted-foreground">
             {results.length} result{results.length === 1 ? "" : "s"} for &ldquo;{q}&rdquo;
@@ -24,11 +26,11 @@ export default async function SearchPage({
       <div className="space-y-2">
         {results.map((r) => (
           <Link key={`${r.type}-${r.id}`} href={r.url}>
-            <Card className="transition-colors hover:bg-secondary/50">
-              <CardContent className="flex items-center justify-between gap-4 py-4">
-                <div>
-                  <p className="font-medium">{r.title}</p>
-                  <p className="text-sm text-muted-foreground">{r.subtitle}</p>
+            <Card className="transition-all duration-150 hover:-translate-y-0.5 hover:shadow-elevation-md">
+              <CardContent className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{r.title}</p>
+                  <p className="truncate text-sm text-muted-foreground">{r.subtitle}</p>
                 </div>
                 <Badge variant="outline" className="shrink-0 capitalize">
                   {r.type}
@@ -38,7 +40,13 @@ export default async function SearchPage({
           </Link>
         ))}
         {q && results.length === 0 && (
-          <p className="text-sm text-muted-foreground">No results.</p>
+          <div className="rounded-xl border bg-card shadow-elevation-sm">
+            <EmptyState
+              icon={SearchX}
+              title="No results"
+              description={`Nothing matched "${q}" across applications, contacts, emails, or documents.`}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { StatusBadge } from "@/components/app/status-badge";
+import { EmptyState } from "@/components/app/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -11,7 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Plus } from "lucide-react";
+import { FileText, Plus } from "lucide-react";
 
 export default async function ApplicationsPage() {
   const applications = await prisma.application.findMany({
@@ -22,7 +23,7 @@ export default async function ApplicationsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Applications</h1>
+          <h1 className="text-2xl font-semibold tracking-tight">Applications</h1>
           <p className="text-sm text-muted-foreground">
             {applications.length} total
           </p>
@@ -34,50 +35,51 @@ export default async function ApplicationsPage() {
         </Button>
       </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>School</TableHead>
-              <TableHead>Program</TableHead>
-              <TableHead>Degree</TableHead>
-              <TableHead>Term</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Deadline</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applications.map((app) => (
-              <TableRow key={app.id} className="cursor-pointer">
-                <TableCell>
-                  <Link href={`/applications/${app.id}`} className="block font-medium">
-                    {app.school}
-                  </Link>
-                </TableCell>
-                <TableCell>
-                  <Link href={`/applications/${app.id}`} className="block">
-                    {app.program}
-                  </Link>
-                </TableCell>
-                <TableCell>{app.degreeType}</TableCell>
-                <TableCell>{app.term}</TableCell>
-                <TableCell>
-                  <StatusBadge status={app.status} />
-                </TableCell>
-                <TableCell>
-                  {app.deadline ? format(app.deadline, "PP") : "—"}
-                </TableCell>
+      <div className="overflow-hidden rounded-xl border bg-card shadow-elevation-sm">
+        {applications.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title="No applications yet"
+            description="Add one to start tracking deadlines, contacts, and documents in one place."
+          />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>School</TableHead>
+                <TableHead>Program</TableHead>
+                <TableHead>Degree</TableHead>
+                <TableHead>Term</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Deadline</TableHead>
               </TableRow>
-            ))}
-            {applications.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
-                  No applications yet.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {applications.map((app) => (
+                <TableRow key={app.id} className="cursor-pointer">
+                  <TableCell>
+                    <Link href={`/applications/${app.id}`} className="block font-medium">
+                      {app.school}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link href={`/applications/${app.id}`} className="block">
+                      {app.program}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">{app.degreeType}</TableCell>
+                  <TableCell className="text-muted-foreground">{app.term}</TableCell>
+                  <TableCell>
+                    <StatusBadge status={app.status} />
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {app.deadline ? format(app.deadline, "PP") : "—"}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </div>
   );
