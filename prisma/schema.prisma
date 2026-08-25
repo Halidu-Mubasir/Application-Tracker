@@ -239,12 +239,13 @@ model TimelineEvent {
 // ---------- Auth (NextAuth / Auth.js) ----------
 
 model User {
-  id       String    @id @default(cuid())
-  email    String    @unique
-  name     String?
-  image    String?
-  accounts Account[]
-  sessions Session[]
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
