@@ -59,7 +59,10 @@ function CommandDialog({
         )}
         showCloseButton={showCloseButton}
       >
-        {children}
+        {/* shouldFilter=false: results here come pre-filtered from an API
+            call (GlobalSearch), so cmdk should only handle keyboard nav and
+            rendering, not re-filter items against the query itself. */}
+        <Command shouldFilter={false}>{children}</Command>
       </DialogContent>
     </Dialog>
   )

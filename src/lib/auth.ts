@@ -19,7 +19,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // but sessions are JWT-based so middleware can check auth at the edge
   // without a DB round trip.
   adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 }, // 30 days
+  trustHost: true,
   providers: [
     Google({
       authorization: {
