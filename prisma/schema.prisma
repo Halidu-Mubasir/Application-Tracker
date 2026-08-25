@@ -1,0 +1,284 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------- Enums ----------
+
+enum ApplicationStatus {
+  RESEARCHING
+  PROF_CONTACTED
+  SUBMITTED
+  INTERVIEW
+  DECISION_PENDING
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+  WITHDRAWN
+}
+
+enum DocumentType {
+  SOP
+  RESEARCH_PROPOSAL
+  CV
+  TRANSCRIPT
+  WRITING_SAMPLE
+  LOR
+  OTHER
+}
+
+enum RecommenderStatus {
+  ASKED
+  CONFIRMED
+  SUBMITTED
+  DECLINED
+}
+
+enum EmailDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum EventType {
+  STATUS_CHANGE
+  EMAIL_SENT
+  EMAIL_RECEIVED
+  DOCUMENT_LINKED
+  RECOMMENDER_UPDATE
+  DEADLINE
+  DECISION
+  NOTE
+}
+
+// ---------- Core entities ----------
+
+model Application {
+  id           String            @id @default(cuid())
+  school       String
+  program      String
+  department   String?
+  degreeType   String // free text: "PhD", "MA", "MS", "MPhil", ...
+  term         String // e.g. "Fall 2027"
+  status       ApplicationStatus @default(RESEARCHING)
+  deadline     DateTime?
+  decisionDate DateTime?
+  portalUrl    String?
+  fundingInfo  String?
+  notes        String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  contacts     ApplicationContact[]
+  documents    ApplicationDocument[]
+  recommenders RecommenderApplication[]
+  emailThreads EmailThread[]
+  events       TimelineEvent[]
+
+  @@index([status])
+  @@index([deadline])
+}
+
+model Contact {
+  id                 String   @id @default(cuid())
+  name               String
+  email              String?
+  university         String?
+  department         String?
+  researchTags       String[]
+  personalSite       String?
+  scholarUrl         String?
+  orcid              String?
+  notes              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  applications       ApplicationContact[]
+  emailThreads       EmailThread[]
+  events             TimelineEvent[]
+  recommenderProfile Recommender?
+
+  @@index([name])
+}
+
+model ApplicationContact {
+  applicationId String
+  contactId     String
+  role          String? // "POI", "cold-emailed", "committee", ...
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contact     Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, contactId])
+}
+
+model Document {
+  id        String       @id @default(cuid())
+  type      DocumentType
+  title     String // e.g. "Statement of Purpose"
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  versions DocumentVersion[]
+}
+
+model DocumentVersion {
+  id            String   @id @default(cuid())
+  documentId    String
+  versionNumber Int
+  label         String? // e.g. "tailored for Stanford"
+  fileUrl       String // Vercel Blob URL
+  fileName      String
+  mimeType      String
+  sizeBytes     Int
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  document     Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  applications ApplicationDocument[]
+
+  @@unique([documentId, versionNumber])
+}
+
+model ApplicationDocument {
+  applicationId     String
+  documentVersionId String
+  roleNote          String? // e.g. "primary SOP", "writing sample"
+  createdAt         DateTime @default(now())
+
+  application     Application     @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  documentVersion DocumentVersion @relation(fields: [documentVersionId], references: [id], onDelete: Cascade)
+
+  @@id([applicationId, documentVersionId])
+}
+
+model Recommender {
+  id           String   @id @default(cuid())
+  contactId    String   @unique
+  relationship String? // "PhD advisor", "undergrad research supervisor"
+  notes        String?
+  createdAt    DateTime @default(now())
+
+  contact      Contact                   @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  applications RecommenderApplication[]
+}
+
+model RecommenderApplication {
+  recommenderId String
+  applicationId String
+  status        RecommenderStatus @default(ASKED)
+  askedDate     DateTime?
+  submittedDate DateTime?
+  notes         String?
+
+  recommender Recommender @relation(fields: [recommenderId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@id([recommenderId, applicationId])
+}
+
+model EmailThread {
+  id            String    @id @default(cuid())
+  gmailThreadId String    @unique
+  subject       String?
+  applicationId String?
+  contactId     String?
+  lastMessageAt DateTime?
+  createdAt     DateTime  @default(now())
+
+  application Application?   @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  contact     Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  messages    EmailMessage[]
+
+  @@index([applicationId])
+  @@index([contactId])
+}
+
+model EmailMessage {
+  id             String         @id @default(cuid())
+  threadId       String
+  gmailMessageId String         @unique
+  direction      EmailDirection
+  fromAddress    String
+  toAddresses    String[]
+  subject        String?
+  bodyText       String?
+  snippet        String?
+  sentAt         DateTime
+  isTriaged      Boolean        @default(false)
+  createdAt      DateTime       @default(now())
+
+  thread EmailThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([sentAt])
+}
+
+model TimelineEvent {
+  id            String    @id @default(cuid())
+  applicationId String?
+  contactId     String?
+  type          EventType
+  title         String
+  description   String?
+  occurredAt    DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+
+  application Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  contact     Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@index([occurredAt])
+}
+
+// ---------- Auth (NextAuth / Auth.js) ----------
+
+model User {
+  id       String    @id @default(cuid())
+  email    String    @unique
+  name     String?
+  image    String?
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
