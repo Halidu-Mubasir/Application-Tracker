@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { EmptyState } from "@/components/app/empty-state";
+import { DeleteApplicationButton } from "@/components/app/delete-application-button";
 import { unlinkContactFromApplication } from "@/lib/actions/applications";
 import { unlinkDocumentVersionFromApplication } from "@/lib/actions/documents";
 import { removeRecommenderFromApplication } from "@/lib/actions/recommenders";
@@ -67,11 +68,14 @@ export default async function ApplicationDetailPage({
             {application.department && ` · ${application.department}`}
           </p>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link href={`/applications/${id}/edit`}>
-            <Pencil className="size-4" /> Edit
-          </Link>
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/applications/${id}/edit`}>
+              <Pencil className="size-4" /> Edit
+            </Link>
+          </Button>
+          <DeleteApplicationButton applicationId={id} schoolName={application.school} />
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
