@@ -186,3 +186,26 @@
     @apply font-sans;
   }
 }
+
+/* Light/dark switch animation (see ThemeToggle): a circle grows from the
+   toggle button's click point — set as --vt-x/--vt-y/--vt-r right before
+   document.startViewTransition() — until it covers the farthest viewport
+   corner, revealing the new theme underneath instead of an instant swap. */
+@supports (view-transition-name: root) {
+  ::view-transition-old(root) {
+    animation: none;
+  }
+  ::view-transition-new(root) {
+    animation: theme-reveal 550ms ease-in-out;
+    z-index: 1;
+  }
+
+  @keyframes theme-reveal {
+    from {
+      clip-path: circle(0px at var(--vt-x, 100%) var(--vt-y, 0%));
+    }
+    to {
+      clip-path: circle(var(--vt-r, 150%) at var(--vt-x, 100%) var(--vt-y, 0%));
+    }
+  }
+}

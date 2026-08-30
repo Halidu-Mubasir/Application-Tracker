@@ -2,6 +2,7 @@ import Link from "next/link";
 import { auth, signOut } from "@/lib/auth";
 import { MainNav } from "@/components/app/main-nav";
 import { GlobalSearch } from "@/components/app/global-search";
+import { ThemeToggle } from "@/components/app/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { GraduationCap } from "lucide-react";
 
@@ -44,7 +45,10 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
       </aside>
       <div className="flex flex-1 flex-col">
         <header className="flex items-center gap-4 border-b bg-background/80 px-6 py-3.5 backdrop-blur-sm">
-          <GlobalSearch />
+          <div className="flex-1">
+            <GlobalSearch />
+          </div>
+          <ThemeToggle />
         </header>
         <main className="flex-1 px-8 py-7">{children}</main>
       </div>
